@@ -1,0 +1,235 @@
+{
+  "_doc": "Léxico do domínio para a normalização das perguntas do CensoBench. Cada regra é [padrão regex, substituição]; as regras de cada nível são aplicadas na ordem em que aparecem (as mais longas/específicas primeiro). 'maiusculas': true = o padrão diferencia maiúsculas (nomes próprios).",
+  "nivel1_valores": [
+    {
+      "padrao": "\\bmais de uma?\\b",
+      "troca": "mais de [NUM]",
+      "nota": "paráfrase de 'mais de 1': 97 e 104 ficam com o mesmo esqueleto"
+    },
+    {
+      "padrao": "\\b(região|regiões) (norte|nordeste|sudeste|sul|centro-oeste)\\b",
+      "troca": "\\1 [LOCAL]",
+      "nota": "região X → região [LOCAL]"
+    },
+    {
+      "padrao": "\\b(Acre|Alagoas|Amapá|Amazonas|Bahia|Ceará|Distrito Federal|Espírito Santo|Goiás|Maranhão|Mato Grosso do Sul|Mato Grosso|Minas Gerais|Pará|Paraíba|Paraná|Pernambuco|Piauí|Rio de Janeiro|Rio Grande do Norte|Rio Grande do Sul|Rondônia|Roraima|Santa Catarina|São Paulo|Sergipe|Tocantins)\\b",
+      "troca": "[LOCAL]",
+      "maiusculas": true,
+      "nota": "UFs por extenso"
+    },
+    {
+      "padrao": "\\b(Fortaleza|Taubaté|Itupeva)\\b",
+      "troca": "[LOCAL]",
+      "maiusculas": true,
+      "nota": "municípios citados no benchmark (São Paulo já está nas UFs)"
+    },
+    {
+      "padrao": "\\b(rede|redes|escola|escolas|ensino) (públicas?|públicos?|privadas?|privados?|municipais|municipal|estaduais|estadual|federais|federal)\\b",
+      "troca": "\\1 [REDE]",
+      "nota": "dependência administrativa; 'transporte público' NÃO entra (é coluna, nível 2)"
+    },
+    {
+      "padrao": "\\[REDE\\] (e|ou) (públicas?|privadas?)\\b",
+      "troca": "[REDE] \\1 [REDE]",
+      "nota": "rede pública e privada"
+    },
+    {
+      "padrao": "\\b(na|da) (privada|pública)\\b",
+      "troca": "\\1 [REDE]",
+      "nota": "tanto na rede pública quanto na privada"
+    },
+    {
+      "padrao": "\\b(terras?) indígenas?\\b",
+      "troca": "\\1 [LOCALIZACAO]",
+      "nota": "localização diferenciada; antes da regra de raça/cor"
+    },
+    {
+      "padrao": "\\b(rurais|rural|urbanas?|urbanos?)\\b",
+      "troca": "[LOCALIZACAO]"
+    },
+    {
+      "padrao": "\\b(indígenas?|pretos?|pretas?|pardos?|pardas?|brancos?|brancas?|amarelos?|amarelas?)\\b",
+      "troca": "[GRUPO]",
+      "nota": "raça/cor"
+    },
+    {
+      "padrao": "\\bEducação de Jovens e Adultos\\b",
+      "troca": "[ETAPA]"
+    },
+    {
+      "padrao": "\\b(ensino|educação) (médio|fundamental|infantil|EJA|remoto)\\b",
+      "troca": "\\1 [ETAPA]",
+      "nota": "'médio' sozinho NÃO é etapa (número médio)"
+    },
+    {
+      "padrao": "\\[ETAPA\\] (técnico|integral|noturno)\\b",
+      "troca": "[ETAPA] [ETAPA]"
+    },
+    {
+      "padrao": "\\bperíodo (integral|parcial)\\b",
+      "troca": "[ETAPA]",
+      "nota": "turno escolar, não marcador temporal; 'período' fica de fora para não virar indicador temporal no nível 3"
+    },
+    {
+      "padrao": "\\bmodalidade técnico\\b",
+      "troca": "modalidade [ETAPA]"
+    },
+    {
+      "padrao": "\\bEJA\\b",
+      "troca": "[ETAPA]",
+      "maiusculas": true
+    },
+    {
+      "padrao": "\\b(mestre|mestrado|doutorado|doutor|licenciatura|Pedagogia)\\b",
+      "troca": "[FORMACAO]"
+    },
+    {
+      "padrao": "\\b(História|Química|Matemática|Português|Física)\\b",
+      "troca": "[DISCIPLINA]",
+      "maiusculas": true,
+      "nota": "com maiúscula, para não pegar 'deficiência física'"
+    },
+    {
+      "padrao": "\\b(temporários|efetivos|concursados)\\b",
+      "troca": "[VINCULO]"
+    }
+  ],
+  "nivel2_schema": [
+    {
+      "padrao": "\\b(rede de ensino|redes de ensino|tipo de ensino|etapa de ensino|tipo de escola|nome da escola|faixa etária|grau de escolaridade)\\b",
+      "troca": "[ATRIBUTO]"
+    },
+    {
+      "padrao": "\\b(saneamento básico|água potável|laboratório de informática|laboratório de ciências|sala de informática|quadra esportiva|alimentação escolar|transporte escolar público|transporte escolar|transporte público|rampas de acessibilidade|acessibilidade para cadeirantes)\\b",
+      "troca": "[ATRIBUTO]",
+      "nota": "infraestrutura/serviços (colunas booleanas)"
+    },
+    {
+      "padrao": "\\b(necessidades especiais motoras|necessidades especiais|deficiência física|profissionais especializados|vulnerabilidade social|evasão escolar|regime de contratação)\\b",
+      "troca": "[ATRIBUTO]"
+    },
+    {
+      "padrao": "\\b(rede|redes|ensino|educação|estado|estados|região|regiões|cidade|cidades|município|municípios|idade|idades|sexo|gênero|raça|zona|área|áreas|terra|internet|eletricidade|biblioteca|bibliotecas|alimentação|bicicleta|acessibilidade|deficiência|formação|titularidade|grau|disciplina|modalidade|localização)\\b",
+      "troca": "[ATRIBUTO]"
+    },
+    {
+      "padrao": "\\bacesso\\s+(?:a|à)\\s+\\[ATRIBUTO\\]",
+      "troca": "[ATRIBUTO]",
+      "nota": "acesso à internet / a alimentação escolar → um [ATRIBUTO]"
+    },
+    {
+      "padrao": "\\b(matrículas?|alunos?|alunas?|estudantes?|docentes?|professor|professores|professora|professoras|escolas?|turmas?)\\b",
+      "troca": "[ENTIDADE]",
+      "nota": "tabelas/entidades contadas"
+    }
+  ],
+  "nivel3_manter": [
+    "qual",
+    "quais",
+    "quanto",
+    "quantos",
+    "quantas",
+    "quando",
+    "como",
+    "onde",
+    "número",
+    "total",
+    "quantidade",
+    "média",
+    "médio",
+    "mediana",
+    "proporção",
+    "percentual",
+    "porcentagem",
+    "taxa",
+    "razão",
+    "relação",
+    "distribuição",
+    "soma",
+    "maioria",
+    "maior",
+    "maiores",
+    "menor",
+    "menores",
+    "máximo",
+    "mínimo",
+    "crescimento",
+    "aumento",
+    "redução",
+    "queda",
+    "diminuição",
+    "variação",
+    "evolução",
+    "tendência",
+    "diferença",
+    "comparação",
+    "crescente",
+    "decrescente",
+    "ordem",
+    "ranking",
+    "móvel",
+    "ano",
+    "anos",
+    "último",
+    "últimos",
+    "penúltimo",
+    "retrasado",
+    "anterior",
+    "atual",
+    "passado",
+    "seguinte",
+    "seguintes",
+    "período",
+    "intervalo",
+    "inicial",
+    "único",
+    "mesmo",
+    "cada",
+    "algum",
+    "alguma",
+    "nenhum",
+    "nenhuma",
+    "todos",
+    "todas",
+    "respectivo",
+    "respectiva",
+    "x",
+    "tempo",
+    "vez",
+    "status",
+    "disponível",
+    "disponíveis",
+    "diferente",
+    "concentrada",
+    "concentrado",
+    "longo",
+    "acordo",
+    "consideração",
+    "menos",
+    "%",
+    "+",
+    "matriculados",
+    "matriculadas",
+    "matriculado",
+    "matriculada",
+    "aula",
+    "aulas",
+    "tipo",
+    "localizadas",
+    "localizados",
+    "localizada",
+    "localizado"
+  ],
+  "nao_mascarar_ner": [
+    "Brasil",
+    "Censo",
+    "Censo Escolar",
+    "EJA",
+    "Considere",
+    "Considerando",
+    "Região",
+    "censo",
+    "censo escolar",
+    "registro"
+  ]
+}
